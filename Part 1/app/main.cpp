@@ -1,16 +1,17 @@
-#include "logger/Logger.h"
-#include <iostream>
+#include "logger/LoggerFile.h"
+#include "logger/LoggerSocket.h"
+#include <memory>
 
 int main() {
-    logger::Logger log("logs/app.log", logger::LogLevel::INFO);
+    std::unique_ptr<logger::ILogger> logFile = std::make_unique<logger::LoggerFile>("logs/app.log", logger::LogLevel::INFO);
+    logFile->log("File logger: Info", logger::LogLevel::INFO);
+    logFile->log("File logger: Debug", logger::LogLevel::DEBUG);
 
-    log.log("This is a DEBUG message", logger::LogLevel::DEBUG);
-    log.log("This is an INFO message", logger::LogLevel::INFO);
-    log.log("This is an ERROR message", logger::LogLevel::ERROR);
+    logFile->setLogLevel(logger::LogLevel::DEBUG);
+    logFile->log("File logger: Now accepts debug", logger::LogLevel::DEBUG);
 
-    std::cout << "Changing log level to DEBUG..." << std::endl;
-    log.setLogLevel(logger::LogLevel::DEBUG);
-    log.log("Another DEBUG message", logger::LogLevel::DEBUG);
+    std::unique_ptr<logger::ILogger> logSocket = std::make_unique<logger::LoggerSocket>("127.0.0.1", 9000, logger::LogLevel::INFO);
+    logSocket->log("Socket logger: Error test", logger::LogLevel::ERROR);
 
     return 0;
 }

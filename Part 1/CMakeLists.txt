@@ -3,8 +3,7 @@ project(LoggerProject)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# Библиотека
-add_subdirectory(src)
+option(BUILD_SHARED_LIBS "Build shared libraries instead of static" OFF)
 
-# Приложение
+add_subdirectory(src)
 add_subdirectory(app)
