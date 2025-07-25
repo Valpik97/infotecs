@@ -6,12 +6,14 @@
 #include <ctime>
 #include <iomanip>
 #include <sstream>
-
-
-
+#include <iomanip>
+#include <chrono>
+#include <mutex>
+#include <filesystem>
 
 namespace logger {
 
+// Convert log level enum to string
 const char* logLevelToString(LogLevel level) {
     switch (level) {
         case LogLevel::Error:   return "ERROR";
@@ -21,43 +23,57 @@ const char* logLevelToString(LogLevel level) {
     }
 }
 
-LoggerFile::LoggerFile(const std::string& filename, LogLevel defaultLevel)
-    : logFileName_(filename), currentLevel_(defaultLevel) {}
+// Constructor: open log file and write BOM if needed
+LoggerFile::LoggerFile(const std::string &filename, LogLevel level, bool emitBOM)
+    : m_filename(filename), m_logLevel(level), m_emitBOM(emitBOM) {
 
-LoggerFile::~LoggerFile() {}
+    bool isEmpty = !std::filesystem::exists(filename) || 
+                   std::filesystem::file_size(filename) == 0;
 
-void LoggerFile::log(const std::string& message, LogLevel level) {
-    if (level > currentLevel_)
-        return;
+    m_file.open(filename, std::ios::app | std::ios::binary);
 
-    std::lock_guard<std::mutex> lock(mtx_);
+    if (!m_file.is_open()) {
+        throw std::runtime_error("Failed to open log file: " + filename);
+    }
 
-    std::ofstream file(logFileName_, std::ios::app | std::ios::binary); // binary — гарантирует запись байтов
-    if (!file.is_open()) return;
+    // Write BOM if file is empty
+    if (isEmpty && m_emitBOM) {
+        const unsigned char bom[] = {0xEF, 0xBB, 0xBF};
+        m_file.write(reinterpret_cast<const char*>(bom), sizeof(bom));
+    }
+}
 
-    // Получить текущее время
+LoggerFile::~LoggerFile() {
+    m_file.close();
+}
+
+// Log a message if level is sufficient
+void LoggerFile::log(const std::string &message, LogLevel level) {
+    if (level > m_logLevel) return;
+
+    std::lock_guard<std::mutex> lock(m_mutex);
     auto now = std::chrono::system_clock::now();
-    auto now_time = std::chrono::system_clock::to_time_t(now);
-    std::tm tm{};
+    auto time = std::chrono::system_clock::to_time_t(now);
+    std::tm localTime{};
 #ifdef _WIN32
-    localtime_s(&tm, &now_time);
+    localtime_s(&localTime, &time);
 #else
-    localtime_r(&now_time, &tm);
+    localtime_r(&time, &localTime);
 #endif
 
-    std::ostringstream oss;
-    oss << "[" << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "] ";
-    oss << "[" << logLevelToString(level) << "] ";
-    oss << message << "\n";
-
-    file << oss.str();
+    m_file << "[" << std::put_time(&localTime, "%Y-%m-%d %H:%M:%S") << "] "
+           << "[" << logLevelToString(level) << "] "
+           << message << std::endl;
+    m_file.flush();
 }
 
+// Change log level
 void LoggerFile::setLogLevel(LogLevel level) {
-    std::lock_guard<std::mutex> lock(mtx_);
-    currentLevel_ = level;
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_logLevel = level;
 }
 
+// Get current time as string
 std::string LoggerFile::getCurrentTimeString() const {
     std::time_t now = std::time(nullptr);
     std::tm localTime;
@@ -74,3 +90,4 @@ std::string LoggerFile::getCurrentTimeString() const {
 }
 
 } // namespace logger
+

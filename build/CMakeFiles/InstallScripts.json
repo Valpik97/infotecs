@@ -1,9 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"D:/c++/Bibl/build/cmake_install.cmake",
-		"D:/c++/Bibl/build/logger/cmake_install.cmake",
-		"D:/c++/Bibl/build/app/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

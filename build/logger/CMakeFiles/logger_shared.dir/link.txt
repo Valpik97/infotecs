@@ -1,3 +1,0 @@
-"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\logger_shared.dir/objects.a
-C:\MinGW\bin\ar.exe qc CMakeFiles\logger_shared.dir/objects.a @CMakeFiles\logger_shared.dir\objects1.rsp
-C:\MinGW\bin\c++.exe -shared -o liblogger_shared.dll -Wl,--out-implib,liblogger_shared.dll.a -Wl,--major-image-version,0,--minor-image-version,0 -Wl,--whole-archive CMakeFiles\logger_shared.dir/objects.a -Wl,--no-whole-archive @CMakeFiles\logger_shared.dir\linkLibs.rsp

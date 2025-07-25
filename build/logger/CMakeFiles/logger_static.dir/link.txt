@@ -1,2 +1,0 @@
-C:\MinGW\bin\ar.exe qc liblogger_static.a CMakeFiles/logger_static.dir/src/LoggerFile.cpp.obj
-C:\MinGW\bin\ranlib.exe liblogger_static.a

@@ -1,15 +1,11 @@
-add_library(logger_static STATIC
-    src/LoggerFile.cpp
-)
+option(USE_SHARED "Build logger as a shared library" ON)
 
-add_library(logger_shared SHARED
-    src/LoggerFile.cpp
-)
-
-target_include_directories(logger_static PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
-target_include_directories(logger_shared PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
+if(USE_SHARED)
+    add_library(logger_shared SHARED src/LoggerFile.cpp)
+    target_include_directories(logger_shared PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    set_target_properties(logger_shared PROPERTIES OUTPUT_NAME logger)
+else()
+    add_library(logger_static STATIC src/LoggerFile.cpp)
+    target_include_directories(logger_static PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    set_target_properties(logger_static PROPERTIES OUTPUT_NAME logger)
+endif()

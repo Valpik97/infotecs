@@ -9,11 +9,13 @@
 
 using namespace logger;
 
+// Shared queue for messages
 std::queue<std::pair<std::string, LogLevel>> msgQueue;
 std::mutex queueMutex;
 std::condition_variable cv;
 bool done = false;
 
+// Logger thread: writes messages from queue
 void loggerThreadFunc(LoggerFile& logger) {
     while (true) {
         std::unique_lock<std::mutex> lock(queueMutex);
@@ -33,6 +35,7 @@ void loggerThreadFunc(LoggerFile& logger) {
     }
 }
 
+// Parse string to log level
 LogLevel parseLevel(const std::string& levelStr) {
     if (levelStr == "error") return LogLevel::Error;
     if (levelStr == "warning") return LogLevel::Warning;
@@ -51,10 +54,11 @@ int main(int argc, char* argv[]) {
         defaultLevel = parseLevel(argv[2]);
     }
 
-    LoggerFile logger(logfile, defaultLevel);
+    LoggerFile logger(logfile, defaultLevel); 
 
     std::thread loggerThread(loggerThreadFunc, std::ref(logger));
 
+    // Main input loop
     while (true) {
         std::cout << "Enter message (or 'exit' to quit): ";
         std::string msg;
@@ -75,6 +79,7 @@ int main(int argc, char* argv[]) {
         cv.notify_one();
     }
 
+    // Signal logger thread to finish
     {
         std::lock_guard<std::mutex> lock(queueMutex);
         done = true;

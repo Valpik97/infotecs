@@ -1,9 +1,0 @@
-D:/c++/Bibl/build/CMakeFiles/edit_cache.dir
-D:/c++/Bibl/build/CMakeFiles/rebuild_cache.dir
-D:/c++/Bibl/build/logger/CMakeFiles/logger_static.dir
-D:/c++/Bibl/build/logger/CMakeFiles/logger_shared.dir
-D:/c++/Bibl/build/logger/CMakeFiles/edit_cache.dir
-D:/c++/Bibl/build/logger/CMakeFiles/rebuild_cache.dir
-D:/c++/Bibl/build/app/CMakeFiles/logger_app.dir
-D:/c++/Bibl/build/app/CMakeFiles/edit_cache.dir
-D:/c++/Bibl/build/app/CMakeFiles/rebuild_cache.dir
