@@ -1,3 +1,4 @@
+[🇷🇺 Читать на русском](README_RU.md)
 # Logger Library & Demo Application
 
 ## Overview
